@@ -3,6 +3,7 @@ import csv
 import json
 import pickle
 
+# klasy odpowiadające za odczyt i zapis plikow
 class BaseReader:
     def modify_data(self, data, file):
         for files in file:
@@ -23,6 +24,7 @@ class BaseReader:
         return data
 
 
+# odczyt i zapis plikow CSV
 class CSVReader(BaseReader):
     def read(self, file):
             with open(file, 'r') as f:
@@ -33,6 +35,7 @@ class CSVReader(BaseReader):
             csv.writer(f).writerows(data)
 
 
+# odczyt i zapis plikow JSON
 class JSONReader(BaseReader):
     def read(self, file):
         with open(file, 'r') as f:
@@ -43,6 +46,7 @@ class JSONReader(BaseReader):
             json.dump(data, f)
 
 
+# odczyt i zapis plikow tekstowych
 class TXTReader(BaseReader):
     def read(self, file):
         with open(file, 'r') as f:
@@ -55,6 +59,7 @@ class TXTReader(BaseReader):
                 f.write(','.join(line) + '\n')
 
 
+# odczyt i zapis plikow binarnych
 class PickleReader(BaseReader):
     def read(self, file):
         with open(file, 'rb') as f:
@@ -65,6 +70,7 @@ class PickleReader(BaseReader):
             pickle.dump(data, f)
 
 
+# slownik mapujacy do konkretnej klasy
 types = {'csv': CSVReader(),
          'json': JSONReader(),
          'txt': TXTReader(),
@@ -81,14 +87,20 @@ file_in = sys.argv[1]
 file_out = sys.argv[2]
 changes = sys.argv[3:]
 
+# sprawdzenie i przypisanie do zmiennej rodzaju pliku
 in_file = file_in.split('.')[-1]
 out_file = file_out.split('.')[-1]
 
+# odczyt pliku
 type = types[in_file]
 data = type.read(file_in)
+
+# wywolanie funkcji i zmiana danych
 modified_data = type.modify_data(data, changes)
 
+# wyswietlenie zmodyfikowanego pliku
 print(f'Zmodyfikowany plik będzie miał następującą zawartość: \n{modified_data}')
 
+# zapisanie do pliku
 type = types[out_file]
 type.write(file_out, modified_data)
