@@ -72,6 +72,11 @@ class PickleReader(BaseReader):
             pickle.dump(data, f)
 
 
+types = {'csv': CSVReader('csv'),
+        'json': JSONReader('json'),
+        'txt': TXTReader('txt'),
+        'pickle': PickleReader('pickle')}
+
 
 # jezeli uzytkownik poda za malo argumentow program zakonczy dzialanie
 if len(sys.argv) < 2:
@@ -83,7 +88,14 @@ file_in = sys.argv[1]
 file_out = sys.argv[2]
 changes = sys.argv[3:]
 
-data = []
+in_file = file_in.split('.')[-1]
+out_file = file_out.split('.')[-1]
 
+type = types[in_file]
+data = type.read(file_in)
+modified_data = type.modified_data(data, changes)
 
-print(f'Zmodyfikowany plik będzie miał następującą zawartość: \n{data}')
+print(f'Zmodyfikowany plik będzie miał następującą zawartość: \n{modified_data}')
+
+type = types[out_file]
+type.write(out_file, modified_data)
